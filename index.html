@@ -9,6 +9,7 @@
     <link href="https://cdn.bootcss.com/flat-ui/2.3.0/css/flat-ui.min.css" rel="stylesheet">
     <link rel="icon" href="http://www.zju.edu.cn/_upload/tpl/00/14/20/template20/images/favicon.ico" type="image/x-icon">
     <style>
+
     	#canvas {
     		position: absolute;
     		z-index: -1;
@@ -20,7 +21,7 @@
 	<canvas id="canvas"></canvas>
 	<div class="container">
 		<h1>ZJUintl军训稿件提交系统</h1>
-		<form>
+		<form  name="input" action="" method="get">
 			<div class="row"> 
 			<div class="form-group col-xs-5">
             	姓名<input type="text" value="" placeholder="Inactive" class="form-control" id="Name" required/>
@@ -45,19 +46,36 @@
 	            	稿件标题<input type="text" value="" placeholder="Inactive" class="form-control" id="Title" required/>
 	        	</div>						
 			</div>
-			<br>			
+			<br>
+			<div class="row">
+				<div class="col-xs-5">
+					<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload" required>		
+				</div>
+				<div class="col-xs-5">
+			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交">
+				</div>
+			</div>						
 		</form>
+
+		<br><br>
 		<div class="row">
-			<div class="col-xs-5">
-				<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload">		
-			</div>
-			<div class="col-xs-5">
-		 		<a class="btn btn-block btn-lg btn-inverse" id="Submit">提交</a>
-			</div>
+			<p class="text-left">
+			系统使用说明：<br>
+			1.输入姓名,学号,稿件标题，并选择稿件类型后提交文件.<br>
+			2.文件类型要求为*.docx<br>
+			3.Word文件名系统会自动生成，所以可以随意一些.<br>
+			4.<a><strong>文件内容格式规范</strong>.</a><br>
+			5.请不要恶意使用本系统(包括且不限于XXS等手段)(并没有写filter)<br>
+			6.如遇问题，欢迎联系我：i@laphets.com<br>
+			7.在系统未完善前，请不要重复提交！
+			</p>
 		</div>
-
-
-
+		<nav class="navbar-fixed-bottom">
+		  <div class="container">
+		    <p class="text-center">Copyright © 2015-2017 <a href="https://blog.laphets.com">Laphets</a>. All Rights Reserved.</p>
+		  </div>
+		</nav>
+		
 	</div>
 
 	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
@@ -67,22 +85,29 @@
 	<script>
 		Bmob.initialize("968ee2c53073efada1055d4f19a04e90", "7a72ab30cd2765ed44d33482b80fc70a");
 		$(document).ready(function(){
-			$("#Submit").click(function(){
+			$("form").submit(function(e){
+				e.preventDefault();
 				//Get Data
 				var stuNumber = $("#Number").val();
 				var artiType = $("#Type").val();
 				var Title = $("#Title").val();
 				//alert(Title);
-
+				
 				//Submit data
 				var Student = Bmob.Object.extend("Student");
 				//var myStudent = new Student();
 
 				var query = new Bmob.Query(Student);
 				query.equalTo("stuNumber",stuNumber);
-
+				var unexist = false;
 	            query.find({
 	                success: function(results) {
+	                	if (results.length==0) {
+	                		unexist=true;
+	                		alert("当前用户不存在！");
+	                		//break;
+	                		return;
+	                	}
                         var objectfi = results[0];
                         //alert(objectfi.id);
 
@@ -97,19 +122,22 @@
 					            //alert("create object success "+objectUpdate.get("Submit"));
 					          },
 					          error: function(model, error) {
-					            alert("create object fail");
+					            alert("更新Status错误！");
 					          }
 					        });
 					      },
 					      error: function(object, error) {
-					        alert("query object fail");
+					        alert("查找Status错误！");
 					      }
 					    });
 	                },
 	                error: function(error) {
-	                    alert("Fail!");
+	                    alert("查找ZJUid错误！");
 	                }
 	            });
+	            
+	            	
+	            	
 				//Submit the file
     			var fileUploadControl = $("#profilePhotoFileUpload")[0];
 		        if (fileUploadControl.files.length > 0) {
@@ -117,9 +145,10 @@
 			        var name = artiType+" 一团十四连投稿 "+Title+".docx";
 			        var file = new Bmob.File(name, bytes);
 			        file.save().then(function(obj) {
-					  //alert(obj.url());
+					  alert("提交成功！");
+
 					}, function(error) {
-					  alert("Save failed.");
+					  alert("文件提交出现错误！");
 					});
 		    	}
   			});
@@ -135,7 +164,7 @@
 		var context = canvas.getContext('2d');
 		context.strokeStyle = 'rgba(0,0,0,0.02)',
 		context.strokeWidth = 1,
-		context.fillStyle = 'rgba(0,0,20,0.05)';
+		context.fillStyle = 'rgba(0,0,0,0.05)';
 		var circleArr = [];
 
 		//线条：开始xy坐标，结束xy坐标，线条透明度
@@ -227,7 +256,6 @@
 				draw();
 			}, 16);
 		}
-
 	</script>
 </body>
 </html>
