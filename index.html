@@ -21,23 +21,82 @@
 	<canvas id="canvas"></canvas>
 	<div class="container">
 		
-		<div class="alert alert-success alert-dismissable" id="Dial">
-			<button type="button" class="close" data-dismiss="alert"
-					aria-hidden="true">
-				&times;
-			</button>
-			提交成功辣哈哈哈哈 (●ﾟωﾟ●)
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							欢迎来到ZJUintl军训稿件提交系统!
+						</h4>
+					</div>
+					<div class="modal-body">
+						V1.1 更新日志：<br>
+						1.修复了提交反馈不明显的bug,更新了UI界面细节<br>
+						2.完善了提交系统内部逻辑<br>
+						3.实现了后台稿件获取系统<br>
+
+						<h5>还请大家注意稿件格式规范，如果在稿件内部没有<kbd>名字</kbd>，则视未交处理</h5>
+						<img src="https://m.laphets.com/sam.jpg" class="img-responsive center-block">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-success" data-dismiss="modal">我已了解
+						</button>
+						<button type="button" class="btn btn-default">就不这么做
+						</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
 		</div>
+
+
+		<!-- 模态框（Modal） -->
+		<div class="modal fade" id="SubmitModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							您的稿件已经成功提交
+						</h4>
+					</div>
+					<div class="modal-body">
+					感谢您的配合 (●ﾟωﾟ●)！
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-inverse" data-dismiss="modal">关闭
+						</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
 		<h1>ZJUintl军训稿件提交系统</h1>
 		<!--<h3>请在文章中加上<kbd>姓名</kbd>！看样式 （提交按钮按一次就好）</h3> -->
-		<h3>系统正在维护...o((⊙﹏⊙))o.,请稍后提交</h3>
 		<form  name="input" action="" method="get">
 			<div class="row"> 
+
+
 			<div class="form-group col-xs-5">
-            	姓名<input type="text" value="" placeholder="Inactive" class="form-control" id="Name" required/>
+            	姓名<input type="text" value="" placeholder="Enter your name" class="form-control" id="Name" required/>
         	</div>
+        	<style>
+				#icon{
+				position: absolute;left: 0；z-index:5;
+				background-image: url(user.png); /*引入图片图片*/
+				background-repeat: no-repeat; /*设置图片不重复*/
+				background-position: 0px 0px; /*图片显示的位置*/
+				width: 20px; /*设置图片显示的宽*/
+				height: 20px; /*图片显示的高*/
+				}
+        	</style>
 			<div class="form-group col-xs-5">
-            	学号<input type="text" value="" placeholder="Inactive" class="form-control" id="Number" required/>
+            	学号<input type="text" value="" placeholder="ZJUid" class="form-control" id="Number" required/>
         	</div>
 
 
@@ -59,7 +118,7 @@
 		          	</select>					
 				</div>
 				<div class="form-group col-xs-7">
-	            	稿件标题<input type="text" value="" placeholder="Inactive" class="form-control" id="Title" required/>
+	            	稿件标题<input type="text" value="" placeholder="Title" class="form-control" id="Title" required/>
 	        	</div>						
 			</div>
 			<br>
@@ -68,7 +127,7 @@
 					<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload" required accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">		
 				</div>
 				<div class="col-xs-5">
-			 		<input class="btn btn-block btn-lg btn-default disabled" value="提交">
+			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交">
 				</div>
 			</div>						
 		</form>
@@ -77,12 +136,11 @@
 		<div class="row">
 			<p class="text-left">
 			系统使用说明：<br>
-			1.输入姓名,学号,稿件标题，并选择稿件类型后提交文件.<br>
-			2.文件类型要求为 <kbd>*.docx</kbd><br>
-			3.Word文件名系统会自动生成，所以可以随意一些.<br>
-			4.务必注意<a href="https://m.laphets.com/sample.docx"><strong>文件内容格式规范</strong>.</a><br>
-			5.请不要恶意使用本系统(包括且不限于XSS等手段)(并没有写filter)<br>
-			6.如遇问题，欢迎联(sao)系(rao)我: <kbd>i@laphets.com</kbd><br>		
+			1.文件类型要求为 <kbd>*.docx</kbd><br>
+			2.Word文件名系统会自动生成，所以可以随意一些.<br>
+			3.务必注意<a href="https://m.laphets.com/sample.docx"><strong>文件内容格式规范</strong>.</a><br>
+			4.请不要恶意使用本系统(包括且不限于XSS等手段)(并没有写filter)<br>
+			5.如遇问题，欢迎联(sao)系(rao)我: <kbd>i@laphets.com</kbd><br>		
 			</p>
 		</div>
 		<nav class="navbar-fixed-bottom">
@@ -98,10 +156,16 @@
 	<script src="application.js"></script>
 	<script type="text/javascript" src="bmob-min.js"></script>
 	<script>
-		$("#Dial").hide();
+
+		
+
 		Bmob.initialize("968ee2c53073efada1055d4f19a04e90", "7a72ab30cd2765ed44d33482b80fc70a");
+		$(function () { $('#myModal').modal({
+			keyboard: true
+		})});
 		$(document).ready(function(){
 			$("form").submit(function(e){
+
 				e.preventDefault();
 				//Get Data
 				var stuNumber = $("#Number").val();
@@ -163,7 +227,7 @@
 			        var name = artiType+" 一团十四连投稿 "+Title+".docx";
 			        var file = new Bmob.File(name, bytes);
 			        file.save().then(function(obj) {
-					  //alert("提交成功！");
+					  
 					  //Update fileURL && Title
 					  //alert(objID);
 					  //alert(obj.url());
@@ -185,9 +249,10 @@
 					      error: function(object, error) {
 					        alert("查找File错误！");
 					      }
-					    });					  
-
-					  $("#Dial").slideDown("slow");
+					    });	
+					    $('#SubmitModel').modal('show');		  
+					  	//alert("提交成功！");
+					  //$("#Dial").slideDown("slow");
 					}, function(error) {
 					  alert("文件提交出现错误！");
 					});
