@@ -29,7 +29,8 @@
 			提交成功辣哈哈哈哈 (●ﾟωﾟ●)
 		</div>
 		<h1>ZJUintl军训稿件提交系统</h1>
-		<h3>请在文章中加上<kbd>姓名</kbd>！看样式 （提交按钮按一次就好）</h3>
+		<!--<h3>请在文章中加上<kbd>姓名</kbd>！看样式 （提交按钮按一次就好）</h3> -->
+		<h3>系统正在维护...o((⊙﹏⊙))o.,请稍后提交</h3>
 		<form  name="input" action="" method="get">
 			<div class="row"> 
 			<div class="form-group col-xs-5">
@@ -67,7 +68,7 @@
 					<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload" required accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">		
 				</div>
 				<div class="col-xs-5">
-			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交">
+			 		<input class="btn btn-block btn-lg btn-default disabled" value="提交">
 				</div>
 			</div>						
 		</form>
@@ -81,8 +82,7 @@
 			3.Word文件名系统会自动生成，所以可以随意一些.<br>
 			4.务必注意<a href="https://m.laphets.com/sample.docx"><strong>文件内容格式规范</strong>.</a><br>
 			5.请不要恶意使用本系统(包括且不限于XSS等手段)(并没有写filter)<br>
-			6.如遇问题，欢迎联系我: <kbd>i@laphets.com</kbd><br>
-			7.<strong>今天截稿时间:23:20</strong>届时系统将关闭
+			6.如遇问题，欢迎联(sao)系(rao)我: <kbd>i@laphets.com</kbd><br>		
 			</p>
 		</div>
 		<nav class="navbar-fixed-bottom">
@@ -116,6 +116,7 @@
 				var query = new Bmob.Query(Student);
 				query.equalTo("stuNumber",stuNumber);
 				var unexist = false;
+
 	            query.find({
 	                success: function(results) {
 	                	if (results.length==0) {
@@ -126,7 +127,7 @@
 	                	}
                         var objectfi = results[0];
                         //alert(objectfi.id);
-
+                        objID = objectfi.id;
                         //Set status to be true
                         var queryStatus = new Bmob.Query(Student);
 					    queryStatus.get(objectfi.id, {
@@ -163,6 +164,29 @@
 			        var file = new Bmob.File(name, bytes);
 			        file.save().then(function(obj) {
 					  //alert("提交成功！");
+					  //Update fileURL && Title
+					  //alert(objID);
+					  //alert(obj.url());
+					  var queryFile = new Bmob.Query(Student);
+					  	queryFile.get(objID, {
+					      success: function(object) {
+					        // The object was retrieved successfully.
+					        object.set("fileURL", obj.url());
+					        object.set("Title", name);
+					        object.save(null, {
+					          success: function(objectUpdate) {
+					            //alert("create object success "+objectUpdate.get("Submit"));
+					          },
+					          error: function(model, error) {
+					            alert("更新File错误！");
+					          }
+					        });
+					      },
+					      error: function(object, error) {
+					        alert("查找File错误！");
+					      }
+					    });					  
+
 					  $("#Dial").slideDown("slow");
 					}, function(error) {
 					  alert("文件提交出现错误！");
