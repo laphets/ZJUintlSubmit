@@ -30,26 +30,19 @@
 							&times;
 						</button>
 						<h4 class="modal-title" id="myModalLabel">
-							已过稿件提交时限！
+							欢迎来到ZJUintl军训稿件提交系统!
 						</h4>
 					</div>
 					<div class="modal-body">
-						今天稿件提交截止为<strong>22:00</strong><br>
-						请还未提交的同学采用邮件的形式单独提交<br>
-						<kbd>3160101383@zju.edu.cn</kbd>
-						<a href="mailto:3160101383@zju.edu.cn">点此发送邮件</a>
-						<!--
+						<h5>请大家注意稿件格式规范，如果在稿件内部没有<kbd>名字</kbd>，则视未交处理</h5>
+						请注意稿件中<strong>诗歌</strong>的数量，当到达一定量后，系统会<strong>关闭</strong>诗歌提交入口
 						<img src="https://m.laphets.com/sam.jpg" class="img-responsive center-block">
-						-->
 					</div>
 					<div class="modal-footer">
-
 						<button type="button" class="btn btn-default btn-success" data-dismiss="modal">我已了解
 						</button>
-						<!--
 						<button type="button" class="btn btn-default" >偏不这么做
 						</button>
-						-->
 					</div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
@@ -78,6 +71,34 @@
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>
+
+
+
+		<!-- RequestModel -->
+		<div class="modal fade" id="requestModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							稿件提交情况查询
+						</h4>
+					</div>
+					<div class="modal-body">	
+			        	<input type="text" value="" placeholder="请在此键入您的ZJUid" class="form-control" id="questNumber" required/>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default btn-primary" id="requestBut">查询
+						</button>
+						<button type="button" class="btn btn-default btn-danger" data-dismiss="modal">关闭
+						</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
 
 		<h1>ZJUintl军训稿件提交系统</h1>
 		<!--<h3>请在文章中加上<kbd>姓名</kbd>！看样式 （提交按钮按一次就好）</h3> -->
@@ -116,12 +137,15 @@
 			</div>
 			<br>
 			<div class="row">
-				<div class="col-xs-5">
+				<div class="col-xs-3">
 					<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload" required accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">		
 				</div>
-				<div class="col-xs-5">
-			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交" id="submitBut" disabled="disabled">
+				<div class="col-xs-3">
+			 		<input class="btn btn-block btn-lg btn-success"  value="查询递交结果" id="Request">
 				</div>
+				<div class="col-xs-4">
+			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交" id="submitBut">
+				</div>				
 			</div>						
 		</form>
 
@@ -158,6 +182,45 @@
 			keyboard: true
 		})});
 		$(document).ready(function(){
+			$("#Request").click(function(){
+				$('#requestModel').modal('show');
+			});
+			$("#requestBut").click(function(){
+				//alert(123);
+				var questNumber = $("#questNumber").val();
+				var Student = Bmob.Object.extend("Student");
+				var query = new Bmob.Query(Student);
+				query.equalTo("stuNumber",questNumber);
+
+					query.find({
+	                success: function(results) {
+	                	if (results.length==0) {
+	                		alert("当前用户不存在！");
+	                		//break;
+	                		return;
+                		}
+                		else {
+                			var objectfid = results[0];
+                			var queryDetails = new Bmob.Query(Student);
+                			queryDetails.get(objectfid.id, {
+							      success: function(object) {
+							        // The object was retrieved successfully.
+							        alert(object.get("stuNumber")+" "+object.get("Title"));
+							      },
+							      error: function(object, error) {
+							        alert("查找对象错误！");
+							      }
+                			});
+                		}          	
+	                },
+	                error: function(error) {
+	                    alert("查找ZJUid错误！");
+	                }
+	            });
+
+
+
+			});			
 			$("form").submit(function(e){
 				$('#submitBut').attr("disabled",true); 
 				e.preventDefault();
