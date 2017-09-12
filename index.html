@@ -3,6 +3,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Pace.js -->
+    <link href="pace-theme-flash.css" rel="stylesheet" />
+    <script src="pace.min.js"></script>
     <!-- Bootstrap -->
     <link href="https://cdn.bootcss.com/flat-ui/2.3.0/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">	
     <!-- Flat UI -->
@@ -21,7 +25,7 @@
 	<canvas id="canvas"></canvas>
 	<div class="container">
 		
-		<!-- 模态框（Modal） -->
+		<!-- Modal -->
 		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -34,7 +38,11 @@
 						</h4>
 					</div>
 					<div class="modal-body">
-						<h5>请大家注意稿件格式规范，如果在稿件内部没有<kbd>名字</kbd>，则视未交处理</h5>
+						<h5>V1.2 更新日志</h5>
+						1.修复了由于JS异步产生的若干个提交Bug<br>
+						2.添加了文章提交查询功能与加载进度条<br>
+						3.完善了文章提交系统内部逻辑<br><br>
+						请大家注意稿件格式规范，如果在稿件内部没有<kbd>名字</kbd>，则视未交处理<br>
 						请注意稿件中<strong>诗歌</strong>的数量，当到达一定量后，系统会<strong>关闭</strong>诗歌提交入口
 						<img src="https://m.laphets.com/sam.jpg" class="img-responsive center-block">
 					</div>
@@ -62,7 +70,9 @@
 						</h4>
 					</div>
 					<div class="modal-body">
-					感谢您的配合 (●ﾟωﾟ●)！
+					感谢您的配合 (●ﾟωﾟ●)！<br>
+					<del>今天是系统投入使用的第三天，也是最后一天，</del>最后一天转为泡影，太多的遗憾无法说出口。在这里非常感谢各位同学的支持与配合，让我有机会去不断的完善系统内部逻辑与UI细节。我已经把系统源码部署在GitHub上，如果你有兴趣，欢迎查看。<br>
+					或许再也没有人会来访问这个网页了吧，这个累积了我3天心血，500+行代码的东西了吧...
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default btn-inverse" data-dismiss="modal">关闭
@@ -86,8 +96,10 @@
 							稿件提交情况查询
 						</h4>
 					</div>
-					<div class="modal-body">	
+					<div class="modal-body">
 			        	<input type="text" value="" placeholder="请在此键入您的ZJUid" class="form-control" id="questNumber" required/>
+			        	<br>
+			        	<p class="bg-success"  style="display:block" >...</p>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default btn-primary" id="requestBut">查询
@@ -106,17 +118,17 @@
 			<div class="row"> 
 
 
-			<div class="form-group col-xs-5">
+			<div class="form-group col-md-5">
             	姓名<input type="text" value="" placeholder="Enter your name" class="form-control" id="Name" required/>
         	</div>
-			<div class="form-group col-xs-5">
+			<div class="form-group col-md-5">
             	学号<input type="text" value="" placeholder="ZJUid" class="form-control" id="Number" required/>
         	</div>
 
 
 			</div>
 			<div class="row">
-				<div class="col-xs-3">
+				<div class="col-md-3">
 					稿件类型
 					<br>
 					<select class="form-control select select-primary" data-toggle="select" id="Type">
@@ -131,19 +143,19 @@
 		            	<option value="其他">其他</option>
 		          	</select>					
 				</div>
-				<div class="form-group col-xs-7">
+				<div class="form-group col-md-7">
 	            	稿件标题<input type="text" value="" placeholder="Title" class="form-control" id="Title" required/>
 	        	</div>						
 			</div>
 			<br>
 			<div class="row">
-				<div class="col-xs-3">
+				<div class="col-md-3">
 					<input type="file" class="btn btn-block btn-lg btn-warning" id="profilePhotoFileUpload" required accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">		
 				</div>
-				<div class="col-xs-3">
+				<div class="col-md-3">
 			 		<input class="btn btn-block btn-lg btn-success"  value="查询递交结果" id="Request">
 				</div>
-				<div class="col-xs-4">
+				<div class="col-md-4">
 			 		<input class="btn btn-block btn-lg btn-inverse" type="submit" value="提交" id="submitBut">
 				</div>				
 			</div>						
@@ -184,6 +196,7 @@
 		$(document).ready(function(){
 			$("#Request").click(function(){
 				$('#requestModel').modal('show');
+				$("#questNumber").val($("#Number").val());
 			});
 			$("#requestBut").click(function(){
 				//alert(123);
@@ -205,6 +218,7 @@
                 			queryDetails.get(objectfid.id, {
 							      success: function(object) {
 							        // The object was retrieved successfully.
+
 							        alert(object.get("stuNumber")+" "+object.get("Title"));
 							      },
 							      error: function(object, error) {
@@ -257,6 +271,45 @@
 					        object.set("Submit", true);
 					        object.save(null, {
 					          success: function(objectUpdate) {
+								//Submit the file
+				    			var fileUploadControl = $("#profilePhotoFileUpload")[0];
+						        if (fileUploadControl.files.length > 0) {
+							        var bytes = fileUploadControl.files[0];
+							        //alert(getFileExt(fileUploadControl));
+							        var name = artiType+" 一团十四连投稿 "+Title+".docx";
+							        var file = new Bmob.File(name, bytes);
+							        file.save().then(function(obj) {
+									  
+									  //Update fileURL && Title
+									  //alert(objID);
+									  //alert(obj.url());
+									  var queryFile = new Bmob.Query(Student);
+									  	queryFile.get(objID, {
+									      success: function(object) {
+									        // The object was retrieved successfully.
+									        object.set("fileURL", obj.url());
+									        object.set("Title", name);
+									        object.save(null, {
+									          success: function(objectUpdate) {
+									            //alert("create object success "+objectUpdate.get("Submit"));
+									          },
+									          error: function(model, error) {
+									            alert("更新File错误！");
+									          }
+									        });
+									      },
+									      error: function(object, error) {
+									        alert("查找File错误！");
+									      }
+									    });	
+									    $('#SubmitModel').modal('show');
+									    $('#submitBut').attr("disabled",false); 		  
+									  	//alert("提交成功！");
+									  //$("#Dial").slideDown("slow");
+									}, function(error) {
+									  alert("文件提交出现错误！");
+									});
+						    	}					          	
 					            //alert("create object success "+objectUpdate.get("Submit"));
 					          },
 					          error: function(model, error) {
@@ -273,53 +326,11 @@
 	                    alert("查找ZJUid错误！");
 	                }
 	            });
-	            
-	            	
-	            	
-				//Submit the file
-    			var fileUploadControl = $("#profilePhotoFileUpload")[0];
-		        if (fileUploadControl.files.length > 0) {
-			        var bytes = fileUploadControl.files[0];
-			        //alert(getFileExt(fileUploadControl));
-			        var name = artiType+" 一团十四连投稿 "+Title+".docx";
-			        var file = new Bmob.File(name, bytes);
-			        file.save().then(function(obj) {
-					  
-					  //Update fileURL && Title
-					  //alert(objID);
-					  //alert(obj.url());
-					  var queryFile = new Bmob.Query(Student);
-					  	queryFile.get(objID, {
-					      success: function(object) {
-					        // The object was retrieved successfully.
-					        object.set("fileURL", obj.url());
-					        object.set("Title", name);
-					        object.save(null, {
-					          success: function(objectUpdate) {
-					            //alert("create object success "+objectUpdate.get("Submit"));
-					          },
-					          error: function(model, error) {
-					            alert("更新File错误！");
-					          }
-					        });
-					      },
-					      error: function(object, error) {
-					        alert("查找File错误！");
-					      }
-					    });	
-					    $('#SubmitModel').modal('show');
-					    $('#submitBut').attr("disabled",false); 		  
-					  	//alert("提交成功！");
-					  //$("#Dial").slideDown("slow");
-					}, function(error) {
-					  alert("文件提交出现错误！");
-					});
-		    	}
   			});
 		});
 	</script>
 		<script>
-		//定义画布宽高和生成点的个数
+		
 		var WIDTH = window.innerWidth, HEIGHT = window.innerHeight, POINT = 35;
 		
 		var canvas = document.getElementById('canvas');
@@ -331,7 +342,7 @@
 		context.fillStyle = 'rgba(0,0,0,0.05)';
 		var circleArr = [];
 
-		//线条：开始xy坐标，结束xy坐标，线条透明度
+
 		function Line (x, y, _x, _y, o) {
 			this.beginX = x,
 			this.beginY = y,
@@ -339,7 +350,7 @@
 			this.closeY = _y,
 			this.o = o;
 		}
-		//点：圆心xy坐标，半径，每帧移动xy的距离
+
 		function Circle (x, y, r, moveX, moveY) {
 			this.x = x,
 			this.y = y,
@@ -347,12 +358,12 @@
 			this.moveX = moveX,
 			this.moveY = moveY;
 		}
-		//生成max和min之间的随机数
+
 		function num (max, _min) {
 			var min = arguments[1] || 0;
 			return Math.floor(Math.random()*(max-min+1)+min);
 		}
-		// 绘制原点
+
 		function drawCricle (cxt, x, y, r, moveX, moveY) {
 			var circle = new Circle(x, y, r, moveX, moveY)
 			cxt.beginPath()
@@ -361,7 +372,7 @@
 			cxt.fill();
 			return circle;
 		}
-		//绘制线条
+
 		function drawLine (cxt, x, y, _x, _y, o) {
 			var line = new Line(x, y, _x, _y, o)
 			cxt.beginPath()
@@ -372,7 +383,7 @@
 			cxt.stroke();
 
 		}
-		//初始化生成原点
+
 		function init () {
 			circleArr = [];
 			for (var i = 0; i < POINT; i++) {
@@ -381,7 +392,7 @@
 			draw();
 		}
 
-		//每帧绘制
+
 		function draw () {
 			context.clearRect(0,0,canvas.width, canvas.height);
 			for (var i = 0; i < POINT; i++) {
@@ -403,7 +414,7 @@
 			}
 		}
 
-		//调用执行
+
 		window.onload = function () {
 			init();
 			setInterval(function () {
