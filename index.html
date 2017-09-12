@@ -41,9 +41,9 @@
 						<h5>V1.2 更新日志</h5>
 						1.修复了由于JS异步产生的若干个提交Bug<br>
 						2.添加了文章提交查询功能与加载进度条<br>
-						3.完善了文章提交系统内部逻辑<br><br>
+						3.优化了系统的移动端适配<br><br>
 						请大家注意稿件格式规范，如果在稿件内部没有<kbd>名字</kbd>，则视未交处理<br>
-						请注意稿件中<strong>诗歌</strong>的数量，当到达一定量后，系统会<strong>关闭</strong>诗歌提交入口
+						<!--请注意稿件中<strong>诗歌</strong>的数量，当到达一定量后，系统会<strong>关闭</strong>诗歌提交入口-->
 						<img src="https://m.laphets.com/sam.jpg" class="img-responsive center-block">
 					</div>
 					<div class="modal-footer">
@@ -71,11 +71,11 @@
 					</div>
 					<div class="modal-body">
 					感谢您的配合 (●ﾟωﾟ●)！<br>
-					<del>今天是系统投入使用的第三天，也是最后一天，</del>最后一天转为泡影，太多的遗憾无法说出口。在这里非常感谢各位同学的支持与配合，让我有机会去不断的完善系统内部逻辑与UI细节。我已经把系统源码部署在GitHub上，如果你有兴趣，欢迎查看。<br>
+					<del>今天是系统投入使用的第三天，也是最后一天，</del>最后一天转为泡影，太多的遗憾无法说出口。在这里非常感谢各位同学的支持与配合，让我有机会去不断的完善系统内部逻辑与UI细节。我已经把系统源码部署在<a href="https://github.com/laphets/ZJUintlSubmit" target="_blank">GitHub</a>上，如果你有兴趣，欢迎查看。<br>
 					或许再也没有人会来访问这个网页了吧，这个累积了我3天心血，500+行代码的东西了吧...
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-inverse" data-dismiss="modal">关闭
+						<button type="button" class="btn btn-default btn-danger" data-dismiss="modal">关闭
 						</button>
 					</div>
 				</div><!-- /.modal-content -->
@@ -99,10 +99,10 @@
 					<div class="modal-body">
 			        	<input type="text" value="" placeholder="请在此键入您的ZJUid" class="form-control" id="questNumber" required/>
 			        	<br>
-			        	<p class="bg-success"  style="display:block" >...</p>
+			        	<p id="statusBar"></p>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default btn-primary" id="requestBut">查询
+						<button type="button" class="btn btn-default btn-success" id="requestBut">查询
 						</button>
 						<button type="button" class="btn btn-default btn-danger" data-dismiss="modal">关闭
 						</button>
@@ -175,7 +175,7 @@
 		</div>
 		<nav class="navbar-fixed-bottom">
 		  <div class="container">
-		    <p class="text-center">Copyright © 2015-2017 <a href="https://blog.laphets.com">Laphets</a>. All Rights Reserved.</p>
+		    <p class="text-center">Copyright © 2015-2017 <a href="https://blog.laphets.com" target="_blank">Laphets</a>. All Rights Reserved.</p>
 		  </div>
 		</nav>
 		
@@ -185,252 +185,7 @@
 	<script src="https://cdn.bootcss.com/flat-ui/2.3.0/js/flat-ui.min.js"></script>
 	<script src="application.js"></script>
 	<script type="text/javascript" src="bmob-min.js"></script>
-	<script>
-
-		
-
-		Bmob.initialize("968ee2c53073efada1055d4f19a04e90", "7a72ab30cd2765ed44d33482b80fc70a");
-		$(function () { $('#myModal').modal({
-			keyboard: true
-		})});
-		$(document).ready(function(){
-			$("#Request").click(function(){
-				$('#requestModel').modal('show');
-				$("#questNumber").val($("#Number").val());
-			});
-			$("#requestBut").click(function(){
-				//alert(123);
-				var questNumber = $("#questNumber").val();
-				var Student = Bmob.Object.extend("Student");
-				var query = new Bmob.Query(Student);
-				query.equalTo("stuNumber",questNumber);
-
-					query.find({
-	                success: function(results) {
-	                	if (results.length==0) {
-	                		alert("当前用户不存在！");
-	                		//break;
-	                		return;
-                		}
-                		else {
-                			var objectfid = results[0];
-                			var queryDetails = new Bmob.Query(Student);
-                			queryDetails.get(objectfid.id, {
-							      success: function(object) {
-							        // The object was retrieved successfully.
-
-							        alert(object.get("stuNumber")+" "+object.get("Title"));
-							      },
-							      error: function(object, error) {
-							        alert("查找对象错误！");
-							      }
-                			});
-                		}          	
-	                },
-	                error: function(error) {
-	                    alert("查找ZJUid错误！");
-	                }
-	            });
-
-
-
-			});			
-			$("form").submit(function(e){
-				$('#submitBut').attr("disabled",true); 
-				e.preventDefault();
-				//Get Data
-				var stuNumber = $("#Number").val();
-				var artiType = $("#Type").val();
-				var Title = $("#Title").val();
-				//alert(Title);
-				
-				//Submit data
-				var Student = Bmob.Object.extend("Student");
-				//var myStudent = new Student();
-
-				var query = new Bmob.Query(Student);
-				query.equalTo("stuNumber",stuNumber);
-				var unexist = false;
-
-	            query.find({
-	                success: function(results) {
-	                	if (results.length==0) {
-	                		unexist=true;
-	                		alert("当前用户不存在！");
-	                		//break;
-	                		return;
-	                	}
-                        var objectfi = results[0];
-                        //alert(objectfi.id);
-                        objID = objectfi.id;
-                        //Set status to be true
-                        var queryStatus = new Bmob.Query(Student);
-					    queryStatus.get(objectfi.id, {
-					      success: function(object) {
-					        // The object was retrieved successfully.
-					        object.set("Submit", true);
-					        object.save(null, {
-					          success: function(objectUpdate) {
-								//Submit the file
-				    			var fileUploadControl = $("#profilePhotoFileUpload")[0];
-						        if (fileUploadControl.files.length > 0) {
-							        var bytes = fileUploadControl.files[0];
-							        //alert(getFileExt(fileUploadControl));
-							        var name = artiType+" 一团十四连投稿 "+Title+".docx";
-							        var file = new Bmob.File(name, bytes);
-							        file.save().then(function(obj) {
-									  
-									  //Update fileURL && Title
-									  //alert(objID);
-									  //alert(obj.url());
-									  var queryFile = new Bmob.Query(Student);
-									  	queryFile.get(objID, {
-									      success: function(object) {
-									        // The object was retrieved successfully.
-									        object.set("fileURL", obj.url());
-									        object.set("Title", name);
-									        object.save(null, {
-									          success: function(objectUpdate) {
-									            //alert("create object success "+objectUpdate.get("Submit"));
-									          },
-									          error: function(model, error) {
-									            alert("更新File错误！");
-									          }
-									        });
-									      },
-									      error: function(object, error) {
-									        alert("查找File错误！");
-									      }
-									    });	
-									    $('#SubmitModel').modal('show');
-									    $('#submitBut').attr("disabled",false); 		  
-									  	//alert("提交成功！");
-									  //$("#Dial").slideDown("slow");
-									}, function(error) {
-									  alert("文件提交出现错误！");
-									});
-						    	}					          	
-					            //alert("create object success "+objectUpdate.get("Submit"));
-					          },
-					          error: function(model, error) {
-					            alert("更新Status错误！");
-					          }
-					        });
-					      },
-					      error: function(object, error) {
-					        alert("查找Status错误！");
-					      }
-					    });
-	                },
-	                error: function(error) {
-	                    alert("查找ZJUid错误！");
-	                }
-	            });
-  			});
-		});
-	</script>
-		<script>
-		
-		var WIDTH = window.innerWidth, HEIGHT = window.innerHeight, POINT = 35;
-		
-		var canvas = document.getElementById('canvas');
-		canvas.width = WIDTH,
-		canvas.height = HEIGHT;
-		var context = canvas.getContext('2d');
-		context.strokeStyle = 'rgba(0,0,0,0.02)',
-		context.strokeWidth = 1,
-		context.fillStyle = 'rgba(0,0,0,0.05)';
-		var circleArr = [];
-
-
-		function Line (x, y, _x, _y, o) {
-			this.beginX = x,
-			this.beginY = y,
-			this.closeX = _x,
-			this.closeY = _y,
-			this.o = o;
-		}
-
-		function Circle (x, y, r, moveX, moveY) {
-			this.x = x,
-			this.y = y,
-			this.r = r,
-			this.moveX = moveX,
-			this.moveY = moveY;
-		}
-
-		function num (max, _min) {
-			var min = arguments[1] || 0;
-			return Math.floor(Math.random()*(max-min+1)+min);
-		}
-
-		function drawCricle (cxt, x, y, r, moveX, moveY) {
-			var circle = new Circle(x, y, r, moveX, moveY)
-			cxt.beginPath()
-			cxt.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI)
-			cxt.closePath()
-			cxt.fill();
-			return circle;
-		}
-
-		function drawLine (cxt, x, y, _x, _y, o) {
-			var line = new Line(x, y, _x, _y, o)
-			cxt.beginPath()
-			cxt.strokeStyle = 'rgba(0,0,0,'+ o +')'
-			cxt.moveTo(line.beginX, line.beginY)
-			cxt.lineTo(line.closeX, line.closeY)
-			cxt.closePath()
-			cxt.stroke();
-
-		}
-
-		function init () {
-			circleArr = [];
-			for (var i = 0; i < POINT; i++) {
-				circleArr.push(drawCricle(context, num(WIDTH), num(HEIGHT), num(15, 2), num(10, -10)/40, num(10, -10)/40));
-			}
-			draw();
-		}
-
-
-		function draw () {
-			context.clearRect(0,0,canvas.width, canvas.height);
-			for (var i = 0; i < POINT; i++) {
-				drawCricle(context, circleArr[i].x, circleArr[i].y, circleArr[i].r);
-			}
-			for (var i = 0; i < POINT; i++) {
-				for (var j = 0; j < POINT; j++) {
-					if (i + j < POINT) {
-						var A = Math.abs(circleArr[i+j].x - circleArr[i].x),
-							B = Math.abs(circleArr[i+j].y - circleArr[i].y);
-						var lineLength = Math.sqrt(A*A + B*B);
-						var C = 1/lineLength*7-0.009;
-						var lineOpacity = C > 0.03 ? 0.03 : C;
-						if (lineOpacity > 0) {
-							drawLine(context, circleArr[i].x, circleArr[i].y, circleArr[i+j].x, circleArr[i+j].y, lineOpacity);
-						}
-					}
-				}
-			}
-		}
-
-
-		window.onload = function () {
-			init();
-			setInterval(function () {
-				for (var i = 0; i < POINT; i++) {
-					var cir = circleArr[i];
-					cir.x += cir.moveX;
-					cir.y += cir.moveY;
-					if (cir.x > WIDTH) cir.x = 0;
-					else if (cir.x < 0) cir.x = WIDTH;
-					if (cir.y > HEIGHT) cir.y = 0;
-					else if (cir.y < 0) cir.y = HEIGHT;
-					
-				}
-				draw();
-			}, 16);
-		}
-	</script>
+	<script src="work.js"></script>
+	<script type="text/javascript" src="canvas.js"></script>
 </body>
 </html>
